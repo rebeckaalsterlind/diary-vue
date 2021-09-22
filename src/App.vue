@@ -1,44 +1,61 @@
 <template>
   <div id="app">
  
-    <h2>Hej {{user.firstName}}</h2>
+    <h2>Hej {{newPost.title}}</h2>
     <h4>Du har klickat {{clicked}} gånger på knappen</h4>
     <button @click="onClick" >Click me!</button>
 
     <div v-if="clicked >= 5">
       Nu får du sluta klicka!
     </div>
-    <Post />
+
+    <Post :newPost="newPost" @save="onSubmit"/>
  
   </div>
 </template>
 
 <script>
 
-import Post from './components/post.vue';
+import Post from "./components/Post.vue"
 
 export default {
   name: 'App',
   
   data() {
-    return {
-    user: { firstName: localStorage.getItem("firstName"), lastName: localStorage.getItem("lastName") },
-    clicked: 0
+    let getPost = JSON.parse(localStorage.getItem('allPosts'));
+
+    if(getPost === null) {
+      getPost = {title: ""}
     }
+   
+    return {
+      newPost: { title: getPost.title, date: getPost.date },
+      clicked: 0
+    }
+
   },
   
   components: { Post },
 
   methods: {
     onClick() {
-      console.log('clickat på knapp')
       this.clicked ++;
     },
     onSubmit(evt) {
       evt.preventDefault();
-      console.log('form saved', evt.target.firstName.value)
-      localStorage.setItem("firstName", evt.target.firstName.value)
-      localStorage.setItem("lastName", evt.target.lastName.value)
+
+      let newPost = {"title": evt.target.title.value, "date": evt.target.date.value};
+      let allPosts;
+      
+      if( localStorage.getItem("allPosts") !== null) {
+        allPosts = JSON.parse(localStorage.getItem("allPosts"))
+      } else {
+        allPosts = [];
+      }
+
+      allPosts.push(newPost)
+      localStorage.setItem('allPosts', JSON.stringify(allPosts)); 
+
     }
   }
 

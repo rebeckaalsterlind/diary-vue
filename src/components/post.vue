@@ -1,8 +1,9 @@
 <template>
 
     <form @submit="onSubmit">
-      <input type="text" v-model="user.firstName" id="firstName">
-      <input type="text" v-model="user.lastName" id="lastName">
+      Title: <input type="text" placeholder="Title" id="title">
+      Date: <input type="date" id="date"> <br />
+
       <button>Save</button>
     </form>
   
@@ -11,7 +12,19 @@
 <script>
 
   export default {
-    name: "post"
+    name: "Post",
+    
+    props: {
+      newPost: {
+        type: Object
+      }
+    },
+    methods: {
+      onSubmit(evt) {
+        this.$emit("save", evt);
+      }
+    }
+
   }
 
 </script>
