@@ -1,63 +1,62 @@
 <template>
   <div id="app">
- 
-    <h2>Hej {{newPost.title}}</h2>
-    <h4>Du har klickat {{clicked}} gånger på knappen</h4>
-    <button @click="onClick" >Click me!</button>
-
-    <div v-if="clicked >= 5">
-      Nu får du sluta klicka!
-    </div>
-
-    <Post :newPost="newPost" @save="onSubmit"/>
- 
+    <h1>My diary!</h1>
+      <button v-if="!showForm" @click="showForm = true">Add new post</button>
+    <ShowPosts :diary="diary" />
+  
+    <Post v-if="showForm" :newPost="newPost" @save="onSubmit"/>
   </div>
 </template>
 
 <script>
 
-import Post from "./components/Post.vue"
+import Post from "./components/Post.vue";
+import ShowPosts from "./components/ShowPosts.vue";
 
 export default {
-  name: 'App',
+  name: 'App',  
+  components: { Post, ShowPosts },
   
   data() {
-    let getPost = JSON.parse(localStorage.getItem('allPosts'));
 
-    if(getPost === null) {
-      getPost = {title: ""}
-    }
+    let getPost = JSON.parse(localStorage.getItem('allPosts'));
+    if(getPost === null) getPost = {}
    
     return {
-      newPost: { title: getPost.title, date: getPost.date },
-      clicked: 0
+      newPost: { title: getPost.title, date: getPost.date, content: getPost.content },
+      diary: [],
+      showForm: false
     }
 
   },
-  
-  components: { Post },
 
   methods: {
-    onClick() {
-      this.clicked ++;
-    },
+
     onSubmit(evt) {
       evt.preventDefault();
 
-      let newPost = {"title": evt.target.title.value, "date": evt.target.date.value};
-      let allPosts;
+      let newPost = {"title": evt.target.title.value, "date": evt.target.date.value, "content": evt.target.content.value};
+   
       
       if( localStorage.getItem("allPosts") !== null) {
-        allPosts = JSON.parse(localStorage.getItem("allPosts"))
-      } else {
-        allPosts = [];
-      }
+        this.diary = JSON.parse(localStorage.getItem("allPosts"))
+      } 
+      
+      this.diary.push(newPost)
+      localStorage.setItem('allPosts', JSON.stringify(this.diary)); 
 
-      allPosts.push(newPost)
-      localStorage.setItem('allPosts', JSON.stringify(allPosts)); 
+      this.showForm = false; 
 
     }
-  }
+
+  },
+    created() {
+         if( localStorage.getItem("allPosts") !== null) {
+        this.diary = JSON.parse(localStorage.getItem("allPosts"))
+      } 
+  },
+
+
 
 }
 </script>
